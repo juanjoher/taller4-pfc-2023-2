@@ -11,7 +11,7 @@ import org.scalameter.Warmer
 
 import scala.util.Random
 
-object Taller4{
+class Taller4{
   type Matriz = Vector[Vector[Int]]
 
   def matrizAlAzar(long: Int, vals: Int): Matriz = {
@@ -43,7 +43,7 @@ object Taller4{
   }
 
   def multMatriz(m1: Matriz, m2: Matriz): Matriz = {
-    require(m1.nonEmpty && m1.size == m1.head.size && m1.size == m2.size && m2.size == m2.head.size, "Las matrices deben ser cuadradas y tener la misma dimensión")
+
 
     val n = m1.head.size
 
@@ -68,15 +68,12 @@ object Taller4{
     // Recibe m1 y m2 matrices cuadradas de la misma dimensión (potencia de 2)
     // y devuelve la matriz resultante de la suma de las dos matrices
 
-    require(m1.length == m2.length && m1.headOption.getOrElse(Vector()).length == m2.headOption.getOrElse(Vector()).length, "Las matrices deben tener la misma dimensión")
-
     Vector.tabulate(m1.length, m1.headOption.getOrElse(Vector()).length) { (i, j) =>
       m1(i)(j) + m2(i)(j)
     }
   }
 
   def multMatrizRec(m1: Matriz, m2: Matriz): Matriz = {
-    require(m1.nonEmpty && m1.size == m1.head.size && m1.size == m2.size && m2.size == m2.head.size, "Las matrices deben ser cuadradas y tener la misma dimensión")
 
     val n = m1.head.size
 
@@ -114,7 +111,6 @@ object Taller4{
     // Recibe m1 y m2 matrices cuadradas de la misma dimensión (potencia de 2)
     // y devuelve la matriz resultante de la resta de las dos matrices
 
-    require(m1.length == m2.length && m1.headOption.getOrElse(Vector()).length == m2.headOption.getOrElse(Vector()).length, "Las matrices deben tener la misma dimensión")
 
     Vector.tabulate(m1.length, m1.headOption.getOrElse(Vector()).length) { (i, j) =>
       m1(i)(j) - m2(i)(j)
@@ -126,9 +122,8 @@ object Taller4{
     // Recibe m1 y m2 matrices cuadradas de la misma dimensión (potencia de 2)
     // y devuelve la multiplicación de las dos matrices usando el algoritmo de Strassen
 
-    require(m1.nonEmpty && m1.size == m1.head.size && m1.size == m2.size && m2.size == m2.head.size, "Las matrices deben ser cuadradas y tener la misma dimensión")
 
-    val n = m1.head.size
+    val n = m1.head.count(_=>true)
 
     if (n == 1) {
       Vector(Vector(m1(0)(0) * m2(0)(0)))
@@ -168,14 +163,8 @@ object Taller4{
     }
   }
 
-  def saludo() = "Taller 4 2023-II"
 
-  def main(args: Array[String]): Unit = {
-    println(saludo())
-    println(
-      withWarmer(new Warmer.Default) measure {
-        (1 to 100000000).toArray
-      }
-    )
-  }
+
+
+
  }
