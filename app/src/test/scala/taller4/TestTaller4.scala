@@ -33,4 +33,23 @@ class TestTaller4 extends AnyFunSuite{
         )
         assert(Vector(Vector(26, 26, 26, 26, 26), Vector(26, 26, 26, 26, 26), Vector(26, 26, 26, 26, 26), Vector(26, 26, 26, 26, 26), Vector(26, 26, 26, 26, 26)) == obj.sumMatriz(matriz1,matriz2))
     }
+    test("testResta") {
+        val obj = new Taller4()
+        val matriz1: Matriz = Vector(
+            Vector(1, 2, 3, 4, 5),
+            Vector(6, 7, 8, 9, 10),
+            Vector(11, 12, 13, 14, 15),
+            Vector(16, 17, 18, 19, 20),
+            Vector(21, 22, 23, 24, 25)
+        )
+
+        val matriz2: Matriz = Vector(
+            Vector(25, 24, 23, 22, 21),
+            Vector(10, 12, 14, 16, 18),
+            Vector(1, 2, 3, 4, 5),
+            Vector(10, 9, 8, 7, 6),
+            Vector(5, 4, 3, 2, 1)
+        )
+        assert(Vector(Vector(-24, -22, -20, -18, -16), Vector(-4, -5, -6, -7, -8), Vector(10, 10, 10, 10, 10), Vector(6, 8, 10, 12, 14), Vector(16, 18, 20, 22, 24)) == obj.restaMatriz(matriz1, matriz2))
+    }
 }
