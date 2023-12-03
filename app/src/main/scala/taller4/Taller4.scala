@@ -6,6 +6,7 @@
   */
 package taller4
 
+import common.parallel
 import common._
 import org.scalameter.measure
 import org.scalameter.withWarmer
@@ -103,24 +104,35 @@ class Taller4{
   }
 
   // Función para multiplicar dos matrices recursivamente y de forma paralela
-  def multMatrizRecPar(a: Matriz, b: Matriz): Matriz = {
-    require(a.nonEmpty && b.nonEmpty && a.head.length == b.length, "Matrices cannot be multiplied")
+  def multMatrizRecPar(m1: Matriz, m2: Matriz, threshold: Int): Matriz = {
+    val n = m1.length
+    if (n <= threshold) {
+      multMatrizRec(m1, m2)
+    } else {
+      val a = subMatriz(m1, 0, 0, n / 2)
+      val b = subMatriz(m1, 0, n / 2, n / 2)
+      val c = subMatriz(m1, n / 2, 0, n / 2)
+      val d = subMatriz(m1, n / 2, n / 2, n / 2)
 
-    val rowsA = a.length
-    val colsA = a.head.length
-    val colsB = b.head.length
+      val e = subMatriz(m2, 0, 0, n / 2)
+      val f = subMatriz(m2, 0, n / 2, n / 2)
+      val g = subMatriz(m2, n / 2, 0, n / 2)
+      val h = subMatriz(m2, n / 2, n / 2, n / 2)
 
-    val futures: Vector[Future[Vector[Int]]] = Vector.tabulate(rowsA) { i =>
-      Future {
-        Vector.tabulate(colsB) { j =>
-          (0 until colsA).map(k => a(i)(k) * b(k)(j)).sum
-        }
-      }
+      val (p1, p2) = parallel(multMatrizRecPar(a, sumMatriz(f, h), threshold), multMatrizRecPar(sumMatriz(a, b), h, threshold))
+      val (p3, p4) = parallel(multMatrizRecPar(sumMatriz(c, d), e, threshold), multMatrizRecPar(d, sumMatriz(g, e), threshold))
+      val (p5, p6) = parallel(multMatrizRecPar(sumMatriz(a, d), sumMatriz(e, h), threshold), multMatrizRecPar(sumMatriz(b, d), sumMatriz(g, h), threshold))
+      val p7 = multMatrizRecPar(sumMatriz(a, c), sumMatriz(e, f), threshold)
+
+      val A = sumMatriz(sumMatriz(p5, p4), sumMatriz(p6, p2))
+      val B = sumMatriz(p1, p2)
+      val C = sumMatriz(p3, p4)
+      val D = sumMatriz(sumMatriz(p1, p5), sumMatriz(p3, p7))
+
+      A ++ B ++ C ++ D
     }
-    val resultFuture: Future[Vector[Vector[Int]]] = Future.sequence(futures)
-
-    Await.result(resultFuture, 5.seconds)
   }
+
   def multStrassen(m1: Matriz, m2: Matriz): Matriz = {
     // Recibe m1 y m2 matrices cuadradas de la misma dimensión (potencia de 2)
     // y devuelve la multiplicación de las dos matrices usando el algoritmo de Strassen
