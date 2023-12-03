@@ -1,6 +1,7 @@
 /**
-  * Taller 3 - Programación Funcional
-  * Autores: Juan José Hernandez Arenas - 2259500
+  * Taller 4 - Programación Concurrente
+  * Autores: Carlos Alberto Camacho Castaño - 2160331
+ *           Juan José Hernandez Arenas - 2259500
  *           Santiago Reyes Rodriguez - 2259738
   * Profesor: Carlos A Delgado
   */
@@ -49,7 +50,7 @@ class Taller4{
   }
   //Funciones que calculan el producto punto de dos vectores paralelamente
   def prodPuntoParD(v1: ParVector[Int], v2: ParVector[Int]): Int = {
-    (v1 zip v2).map({case(i, j)=> (i * j)}).sum
+    (v1 zip v2).map({case(i, j)=> i * j}).sum
   }
 
 
@@ -138,7 +139,7 @@ class Taller4{
     // y devuelve la multiplicación de las dos matrices usando el algoritmo de Strassen
 
 
-    val n = m1.head.count(_ => true)
+    val n = m1.head.size
 
     if (n == 1) {
       Vector(Vector(m1(0)(0) * m2(0)(0)))
@@ -218,6 +219,70 @@ class Taller4{
 
     Vector.tabulate(m1.length, m1.headOption.getOrElse(Vector()).length) { (i, j) =>
       m1(i)(j) - m2(i)(j)
+    }
+  }
+
+  def multStrassenPar(m1: Matriz, m2: Matriz): Matriz = {
+    val n = m1.head.size
+    val umbral = 64 // Ajusta este umbral según tus necesidades
+
+    if (n <= umbral) {
+      multStrassen(m1, m2)
+    } else {
+      val m = n / 2
+
+      val a11 = subMatriz(m1, 0, 0, m)
+      val a12 = subMatriz(m1, 0, m, m)
+      val a21 = subMatriz(m1, m, 0, m)
+      val a22 = subMatriz(m1, m, m, m)
+
+      val b11 = subMatriz(m2, 0, 0, m)
+      val b12 = subMatriz(m2, 0, m, m)
+      val b21 = subMatriz(m2, m, 0, m)
+      val b22 = subMatriz(m2, m, m, m)
+
+      val p1 = task {
+        multStrassen(sumMatriz(a11, a22), sumMatriz(b11, b22))
+      }
+      val p2 = task {
+        multStrassen(sumMatriz(a21, a22), b11)
+      }
+      val p3 = task {
+        multStrassen(a11, restaMatriz(b12, b22))
+      }
+      val p4 = task {
+        multStrassen(a22, restaMatriz(b21, b11))
+      }
+      val p5 = task {
+        multStrassen(sumMatriz(a11, a12), b22)
+      }
+      val p6 = task {
+        multStrassen(restaMatriz(a21, a11), sumMatriz(b11, b12))
+      }
+      val p7 = task {
+        multStrassen(restaMatriz(a12, a22), sumMatriz(b21, b22))
+      }
+
+      p1.fork()
+      p2.fork()
+      p3.fork()
+      p4.fork()
+      p5.fork()
+      p6.fork()
+      p7.fork()
+
+      val c11 = restaMatriz(sumMatriz(sumMatriz(p1.join(), p4.join()), p7.join()), p5.join())
+      val c12 = sumMatriz(p3.join(), p5.join())
+      val c21 = sumMatriz(p2.join(), p4.join())
+      val c22 = restaMatriz(sumMatriz(sumMatriz(p1.join(), p3.join()), p6.join()), p2.join())
+
+      // Construir la matriz resultante
+      Vector.tabulate(n, n) { (i, j) =>
+        if (i < m && j < m) c11(i)(j)
+        else if (i < m && j >= m) c12(i)(j - m)
+        else if (i >= m && j < m) c21(i - m)(j)
+        else c22(i - m)(j - m)
+      }
     }
   }
 
