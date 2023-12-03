@@ -1,6 +1,7 @@
 /**
-  * Taller 3 - Programación Funcional
-  * Autores: Juan José Hernandez Arenas - 2259500
+  * Taller 4 - Programación Concurrente
+  * Autores: Carlos Alberto Camacho Castaño - 2160331
+ *           Juan José Hernandez Arenas - 2259500
  *           Santiago Reyes Rodriguez - 2259738
   * Profesor: Carlos A Delgado
   */
