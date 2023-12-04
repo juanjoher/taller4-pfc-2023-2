@@ -20,7 +20,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.DurationInt
 import scala.util.Random
 
-class Taller4{
+class Taller4 {
   type Matriz = Vector[Vector[Int]]
   type ParVector[A] = Vector[A]
 
@@ -34,13 +34,17 @@ class Taller4{
     val v = Vector.fill(long, long)(random.nextInt(vals))
     v
   }
+
   def vectorAlAzar(long: Int, vals: Int): Vector[Int] = {
     //Crea un vector de enteros de longitud long ,
     // con valores aleatorios entre 0 y vals
     val random = new Random()
-    val v = Vector.fill(long) {random.nextInt(vals)}
+    val v = Vector.fill(long) {
+      random.nextInt(vals)
+    }
     v
   }
+
   //Funcion que calcula la submatriz de una matriz
   def subMatriz(m: Matriz, i: Int, j: Int, l: Int): Matriz = {
     // Dada m, matriz cuadrada de NxN, 1 <= i, j <= N, i + n <= N, j + n <= N,
@@ -50,6 +54,7 @@ class Taller4{
       m(i + row)(j + col)
     }
   }
+
   //Funciones que calcula la suma y resta de dos matrices
   def sumMatriz(m1: Matriz, m2: Matriz): Matriz = {
     // Recibe m1 y m2 matrices cuadradas de la misma dimensión (potencia de 2)
@@ -59,6 +64,7 @@ class Taller4{
       m1(i)(j) + m2(i)(j)
     }
   }
+
   def restaMatriz(m1: Matriz, m2: Matriz): Matriz = {
     // Recibe m1 y m2 matrices cuadradas de la misma dimensión (potencia de 2)
     // y devuelve la matriz resultante de la resta de las dos matrices
@@ -78,9 +84,10 @@ class Taller4{
     // Producto punto de dos vectores
     (v1 zip v2).map { case (i, j) => i * j }.sum
   }
+
   //Funciones que calculan el producto punto de dos vectores paralelamente
   def prodPuntoParD(v1: ParVector[Int], v2: ParVector[Int]): Int = {
-    (v1 zip v2).map({case(i, j)=> i * j}).sum
+    (v1 zip v2).map({ case (i, j) => i * j }).sum
   }
 
   //Funcion que calcula la transpuesta de una matriz
@@ -88,7 +95,6 @@ class Taller4{
     val l = m.length
     Vector.tabulate(l, l)((i, j) => m(j)(i))
   }
-
 
 
   //Funcion que calcula la multiplicacion de dos matrices normal, recursivo, con algoritmo de Strassen y paralelo
@@ -99,6 +105,7 @@ class Taller4{
       prodPunto(m1(i), m2t(j))
     }
   }
+
   def multMatrizPar(m1: Matriz, m2: Matriz): Matriz = {
     val m2t = transpuesta(m2)
     val (m1a, m1b) = m1.splitAt(m1.length / 2)
@@ -144,9 +151,11 @@ class Taller4{
       }
     }
   }
-  def multMatrizRecPar(m1: Matriz, m2: Matriz, threshold: Int): Matriz = {
+
+  def multMatrizRecPar(m1: Matriz, m2: Matriz): Matriz = {
     val n = m1.length
-    if (n <= threshold) {
+    val umbral = 64
+    if (n <= umbral) {
       multMatrizRec(m1, m2)
     } else {
       val a = subMatriz(m1, 0, 0, n / 2)
@@ -159,10 +168,10 @@ class Taller4{
       val g = subMatriz(m2, n / 2, 0, n / 2)
       val h = subMatriz(m2, n / 2, n / 2, n / 2)
 
-      val (p1, p2) = parallel(multMatrizRecPar(a, sumMatriz(f, h), threshold), multMatrizRecPar(sumMatriz(a, b), h, threshold))
-      val (p3, p4) = parallel(multMatrizRecPar(sumMatriz(c, d), e, threshold), multMatrizRecPar(d, sumMatriz(g, e), threshold))
-      val (p5, p6) = parallel(multMatrizRecPar(sumMatriz(a, d), sumMatriz(e, h), threshold), multMatrizRecPar(sumMatriz(b, d), sumMatriz(g, h), threshold))
-      val p7 = multMatrizRecPar(sumMatriz(a, c), sumMatriz(e, f), threshold)
+      val (p1, p2) = parallel(multMatrizRecPar(a, sumMatriz(f, h)), multMatrizRecPar(sumMatriz(a, b), h))
+      val (p3, p4) = parallel(multMatrizRecPar(sumMatriz(c, d), e), multMatrizRecPar(d, sumMatriz(g, e)))
+      val (p5, p6) = parallel(multMatrizRecPar(sumMatriz(a, d), sumMatriz(e, h)), multMatrizRecPar(sumMatriz(b, d), sumMatriz(g, h)))
+      val p7 = multMatrizRecPar(sumMatriz(a, c), sumMatriz(e, f))
 
       val A = sumMatriz(sumMatriz(p5, p4), sumMatriz(p6, p2))
       val B = sumMatriz(p1, p2)
@@ -219,6 +228,7 @@ class Taller4{
       }
     }
   }
+
   def multStrassenPar(m1: Matriz, m2: Matriz): Matriz = {
     val n = m1.length
     val umbral = 64
@@ -228,7 +238,7 @@ class Taller4{
       val m = n / 2
 
       val a = subMatriz(m1, 0, 0, m)
-      val b = subMatriz(m1, 0, m,m)
+      val b = subMatriz(m1, 0, m, m)
       val c = subMatriz(m1, m, 0, m)
       val d = subMatriz(m1, m, m, m)
 
@@ -251,10 +261,38 @@ class Taller4{
     }
   }
 
+  object Benchmark {
+    type Matriz = Vector[Vector[Int]]
+
+    def medirTiempo(funcion: => Unit): Double = {
+      val inicio = System.nanoTime()
+      funcion
+      val fin = System.nanoTime()
+      (fin - inicio) / 1e6 // Tiempo en milisegundos
+    }
+
+    def compararAlgoritmos(algoritmo1: (Matriz, Matriz) => Matriz, algoritmo2: (Matriz, Matriz) => Matriz)(m1: Matriz, m2: Matriz): (Double, Double, Double) = {
+      val tiempoAlgoritmo1 = medirTiempo(algoritmo1(m1, m2))
+      val tiempoAlgoritmo2 = medirTiempo(algoritmo2(m1, m2))
+      val relacionRendimiento = tiempoAlgoritmo1 / tiempoAlgoritmo2
+      (tiempoAlgoritmo1, tiempoAlgoritmo2, relacionRendimiento)
+    }
+
+    def compararAlgoritmos2(Funcion1: (Matriz, Matriz) => Matriz, Funcion2: (Matriz, Matriz) => Matriz)(m1: Matriz, m2: Matriz): (Double, Double, Double) = {
+      val timeF1 = withWarmer(new Warmer.Default) measure {
+        Funcion1(m1, m2)
+      }
+      val timeF2 = withWarmer(new Warmer.Default) measure {
+        Funcion2(m1, m2)
+      }
+
+      val promedio = timeF1.value / timeF2.value
+      (timeF1.value, timeF2.value, promedio)
+
+    }
 
 
-
-
-
+  }
 
 }
+
