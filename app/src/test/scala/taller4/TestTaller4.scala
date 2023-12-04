@@ -37,7 +37,6 @@ class TestTaller4 extends AnyFunSuite{
         assert(Vector(Vector(3, -35, -29, 4, -16, 0, -17, 3), Vector(-7, -14, 13, -2, 9, 12, 6, -21), Vector(16, -1, -38, -31, 5, 21, -14, -29), Vector(-19, 13, 6, -10, 13, -11, -18, -19), Vector(-5, 4, -12, -9, -7, -17, 4, 18), Vector(3, 3, 3, -12, -4, 16, -5, 20), Vector(-14, 10, 23, -9, 9, -15, -34, -29), Vector(-12, 0, -3, -14, -3, 3, -16, -7))
           == obj.restaMatriz(matriz1, matriz2))
     }
-
     test("testMultMatriz") {
         val obj = new Taller4()
         //matrices de 3x3
@@ -54,26 +53,6 @@ class TestTaller4 extends AnyFunSuite{
 
         assert(Vector(Vector(30, 24, 18), Vector(84, 69, 54), Vector(138, 114, 90)) == obj.multMatriz(matriz1, matriz2))
     }
-    test("testMultMatrizParalelo") {
-        val obj = new Taller4()
-        //matrices de 4x4
-        val matriz1: Matriz = Vector(
-            Vector(1, 2, 3, 4),
-            Vector(5, 6, 7, 8),
-            Vector(9, 10, 11, 12),
-            Vector(13, 14, 15, 16)
-        )
-        val matriz2: Matriz = Vector(
-            Vector(16, 15, 14, 13),
-            Vector(12, 11, 10, 9),
-            Vector(8, 7, 6, 5),
-            Vector(4, 3, 2, 1)
-        )
-
-        assert(Vector(Vector(80, 70, 60, 50), Vector(240, 214, 188, 162),
-            Vector(400, 358, 316, 274), Vector(560, 502, 444, 386)) == obj.multMatrizPar(matriz1, matriz2))
-    }
-
     test("testMultMatrizRecursivo"){
         val obj = new Taller4()
         //matrices de 4x4
@@ -93,7 +72,7 @@ class TestTaller4 extends AnyFunSuite{
         assert(Vector(Vector(80, 70, 60, 50), Vector(240, 214, 188, 162),
             Vector(400, 358, 316, 274), Vector(560, 502, 444, 386)) == obj.multMatrizRec(matriz1, matriz2))
     }
-    test("testmultMatrizRecursivoParalelo"){
+    test("testmultMatrizRecPar"){
 val obj = new Taller4()
         //matrices de 4x4
         val matriz1: Matriz = Vector(
@@ -113,7 +92,25 @@ val obj = new Taller4()
             Vector(400, 358, 316, 274), Vector(560, 502, 444, 386)) == obj.multMatrizRecPar(matriz1, matriz2, 4))
 
     }
+    test("testMultMatrizPar"){
+        val obj = new Taller4()
+        //matrices de 4x4
+        val matriz1: Matriz = Vector(
+            Vector(1, 2, 3, 4),
+            Vector(5, 6, 7, 8),
+            Vector(9, 10, 11, 12),
+            Vector(13, 14, 15, 16)
+        )
+        val matriz2: Matriz = Vector(
+            Vector(16, 15, 14, 13),
+            Vector(12, 11, 10, 9),
+            Vector(8, 7, 6, 5),
+            Vector(4, 3, 2, 1)
+        )
 
+        assert(Vector(Vector(80, 70, 60, 50), Vector(240, 214, 188, 162),
+            Vector(400, 358, 316, 274), Vector(560, 502, 444, 386)) == obj.multMatrizPar(matriz1, matriz2))
+    }
     test("testStrassen") {
         val obj = new Taller4()
         //matrices de 4x4
@@ -133,7 +130,7 @@ val obj = new Taller4()
         assert(Vector(Vector(80, 70, 60, 50), Vector(240, 214, 188, 162),
             Vector(400, 358, 316, 274), Vector(560, 502, 444, 386)) == obj.multStrassen(matriz1, matriz2))
     }
-    test("testStrassenParalelo"){
+    test("testStrassenPar") {
         val obj = new Taller4()
         //matrices de 4x4
         val matriz1: Matriz = Vector(
@@ -150,9 +147,8 @@ val obj = new Taller4()
         )
 
         assert(Vector(Vector(80, 70, 60, 50), Vector(240, 214, 188, 162),
-            Vector(400, 358, 316, 274), Vector(560, 502, 444, 386)) == obj.multStrassenParalelo(matriz1, matriz2, 4))
+            Vector(400, 358, 316, 274), Vector(560, 502, 444, 386)) == obj.multStrassenPar(matriz1, matriz2))
     }
-
     test("testProductoPunto") {
         val obj = new Taller4()
         val vector1: Vector[Int] = Vector(1, 2, 3, 4, 5)
@@ -164,6 +160,16 @@ val obj = new Taller4()
         val vector1: Vector[Int] = Vector(1, 2, 3, 4, 5)
         val vector2: Vector[Int] = Vector(25, 24, 23, 22, 21)
         assert(335 == obj.prodPuntoParD(vector1, vector2))
+    }
+    test("testSubMatriz") {
+        val obj = new Taller4()
+        val matriz1: Matriz = Vector(
+            Vector(1, 2, 3, 4),
+            Vector(5, 6, 7, 8),
+            Vector(9, 10, 11, 12),
+            Vector(13, 14, 15, 16)
+        )
+        assert(Vector(Vector(10, 11), Vector(14, 15)) == obj.subMatriz(matriz1, 2,1,2))
     }
 
 }
