@@ -161,20 +161,5 @@ val obj = new Taller4()
         val vector2: Vector[Int] = Vector(25, 24, 23, 22, 21)
         assert(335 == obj.prodPuntoParD(vector1, vector2))
     }
-    object Benchmark {
-        type Matriz = Vector[Vector[Int]]
 
-        def testTiempo(funcion: => Unit): Double = {
-            val inicio = System.nanoTime()
-            funcion
-            val fin = System.nanoTime()
-            (fin - inicio) / 1e6 // Tiempo en milisegundos
-        }
-        def compararAlgoritmos(algoritmo1: (Matriz, Matriz) => Matriz, algoritmo2: (Matriz, Matriz) => Matriz)(m1: Matriz, m2: Matriz): (Double, Double, Double) = {
-            val tiempoAlgoritmo1 = testTiempo(algoritmo1(m1, m2))
-            val tiempoAlgoritmo2 = testTiempo(algoritmo2(m1, m2))
-            val relacionRendimiento = tiempoAlgoritmo1 / tiempoAlgoritmo2
-            (tiempoAlgoritmo1, tiempoAlgoritmo2, relacionRendimiento)
-        }
-    }
 }
