@@ -130,6 +130,25 @@ val obj = new Taller4()
         assert(Vector(Vector(80, 70, 60, 50), Vector(240, 214, 188, 162),
             Vector(400, 358, 316, 274), Vector(560, 502, 444, 386)) == obj.multStrassen(matriz1, matriz2))
     }
+    test("testStrassenPar") {
+        val obj = new Taller4()
+        //matrices de 4x4
+        val matriz1: Matriz = Vector(
+            Vector(1, 2, 3, 4),
+            Vector(5, 6, 7, 8),
+            Vector(9, 10, 11, 12),
+            Vector(13, 14, 15, 16)
+        )
+        val matriz2: Matriz = Vector(
+            Vector(16, 15, 14, 13),
+            Vector(12, 11, 10, 9),
+            Vector(8, 7, 6, 5),
+            Vector(4, 3, 2, 1)
+        )
+
+        assert(Vector(Vector(80, 70, 60, 50), Vector(240, 214, 188, 162),
+            Vector(400, 358, 316, 274), Vector(560, 502, 444, 386)) == obj.multStrassenPar(matriz1, matriz2))
+    }
     test("testProductoPunto") {
         val obj = new Taller4()
         val vector1: Vector[Int] = Vector(1, 2, 3, 4, 5)
@@ -141,6 +160,16 @@ val obj = new Taller4()
         val vector1: Vector[Int] = Vector(1, 2, 3, 4, 5)
         val vector2: Vector[Int] = Vector(25, 24, 23, 22, 21)
         assert(335 == obj.prodPuntoParD(vector1, vector2))
+    }
+    test("testSubMatriz") {
+        val obj = new Taller4()
+        val matriz1: Matriz = Vector(
+            Vector(1, 2, 3, 4),
+            Vector(5, 6, 7, 8),
+            Vector(9, 10, 11, 12),
+            Vector(13, 14, 15, 16)
+        )
+        assert(Vector(Vector(10, 11), Vector(14, 15)) == obj.subMatriz(matriz1, 2,1,2))
     }
 
 }
