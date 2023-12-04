@@ -3,6 +3,7 @@
   * Autores: Carlos Alberto Camacho Castaño - 2160331
  *           Juan José Hernandez Arenas - 2259500
  *           Santiago Reyes Rodriguez - 2259738
+ *           Carlos Alberto Camacho Castaño -2160331
   * Profesor: Carlos A Delgado
   */
 package taller4
@@ -23,6 +24,8 @@ class Taller4{
   type Matriz = Vector[Vector[Int]]
   type ParVector[A] = Vector[A]
 
+  //FUNCIONES AUXILIARES
+
   //Funciones que generan matrices y vectores aleatorios
   def matrizAlAzar(long: Int, vals: Int): Matriz = {
     // Crea una matriz de enteros cuadrada de long x long,
@@ -35,13 +38,40 @@ class Taller4{
     //Crea un vector de enteros de longitud long ,
     // con valores aleatorios entre 0 y vals
     val random = new Random()
-    val v = Vector.fill(long) {
-      random.nextInt(vals)
-    }
+    val v = Vector.fill(long) {random.nextInt(vals)}
     v
+  }
+  //Funcion que calcula la submatriz de una matriz
+  def subMatriz(m: Matriz, i: Int, j: Int, l: Int): Matriz = {
+    // Dada m, matriz cuadrada de NxN, 1 <= i, j <= N, i + n <= N, j + n <= N,
+    // devuelve la submatriz de nxn correspondiente a m[i .. i + (n-1), j .. j + (n-1)]
+
+    Vector.tabulate(l, l) { (row, col) =>
+      m(i + row)(j + col)
+    }
+  }
+  //Funciones que calcula la suma y resta de dos matrices
+  def sumMatriz(m1: Matriz, m2: Matriz): Matriz = {
+    // Recibe m1 y m2 matrices cuadradas de la misma dimensión (potencia de 2)
+    // y devuelve la matriz resultante de la suma de las dos matrices
+
+    Vector.tabulate(m1.length, m1.headOption.getOrElse(Vector()).length) { (i, j) =>
+      m1(i)(j) + m2(i)(j)
+    }
+  }
+  def restaMatriz(m1: Matriz, m2: Matriz): Matriz = {
+    // Recibe m1 y m2 matrices cuadradas de la misma dimensión (potencia de 2)
+    // y devuelve la matriz resultante de la resta de las dos matrices
+
+
+    Vector.tabulate(m1.length, m1.headOption.getOrElse(Vector()).length) { (i, j) =>
+      m1(i)(j) - m2(i)(j)
+    }
   }
 
 
+
+  //EJERCICIOS DE PROGRAMACION
 
   //Funciones que calculan el producto punto de dos vectores
   def prodPunto(v1: Vector[Int], v2: Vector[Int]): Int = {
@@ -52,7 +82,6 @@ class Taller4{
   def prodPuntoParD(v1: ParVector[Int], v2: ParVector[Int]): Int = {
     (v1 zip v2).map({case(i, j)=> i * j}).sum
   }
-
 
   //Funcion que calcula la transpuesta de una matriz
   def transpuesta(m: Matriz): Matriz = {
@@ -70,6 +99,18 @@ class Taller4{
       prodPunto(m1(i), m2t(j))
     }
   }
+  def multMatrizPar(m1: Matriz, m2: Matriz): Matriz = {
+    val m2t = transpuesta(m2)
+    val (m1a, m1b) = m1.splitAt(m1.length / 2)
+
+    val top = task(m1a.map(row => m2t.map(col => prodPunto(row, col))))
+    val bot = task(m1b.map(row => m2t.map(col => prodPunto(row, col))))
+
+    top.join() ++ bot.join()
+  }
+
+
+  //Funciones que calculan la multiplicacion de dos matrices recursivamente y recursivamente paralelo
   def multMatrizRec(m1: Matriz, m2: Matriz): Matriz = {
 
     val n = m1.head.size
@@ -103,8 +144,6 @@ class Taller4{
       }
     }
   }
-
-  // Función para multiplicar dos matrices recursivamente y de forma paralela
   def multMatrizRecPar(m1: Matriz, m2: Matriz, threshold: Int): Matriz = {
     val n = m1.length
     if (n <= threshold) {
@@ -134,6 +173,8 @@ class Taller4{
     }
   }
 
+
+  //Funciones que calculan la multiplicacion de dos matrices con el algoritmo de Strassen y Strassen paralelo
   def multStrassen(m1: Matriz, m2: Matriz): Matriz = {
     // Recibe m1 y m2 matrices cuadradas de la misma dimensión (potencia de 2)
     // y devuelve la multiplicación de las dos matrices usando el algoritmo de Strassen
@@ -178,50 +219,43 @@ class Taller4{
       }
     }
   }
-  def multMatrizPar(m1: Matriz, m2: Matriz): Matriz = {
-    val m2t = transpuesta(m2)
-    val (m1a, m1b) = m1.splitAt(m1.length / 2)
+  def multStrassenParalelo(m1: Matriz, m2: Matriz, umbral: Int): Matriz = {
+    val n = m1.length
+    if (n <= umbral) {
+      multStrassen(m1, m2)
+    } else {
+      val m = n / 2
 
-    val top = task(m1a.map(row => m2t.map(col => prodPunto(row, col))))
-    val bot = task(m1b.map(row => m2t.map(col => prodPunto(row, col))))
+      val a = subMatriz(m1, 0, 0, m)
+      val b = subMatriz(m1, 0, m,m)
+      val c = subMatriz(m1, m, 0, m)
+      val d = subMatriz(m1, m, m, m)
 
-    top.join() ++ bot.join()
-  }
+      val e = subMatriz(m2, 0, 0, n / 2)
+      val f = subMatriz(m2, 0, n / 2, n / 2)
+      val g = subMatriz(m2, n / 2, 0, n / 2)
+      val h = subMatriz(m2, n / 2, n / 2, n / 2)
 
+      val (p1, p2) = parallel(multStrassenParalelo(a, sumMatriz(f, h), umbral), multStrassenParalelo(sumMatriz(a, b), h, umbral))
+      val (p3, p4) = parallel(multStrassenParalelo(sumMatriz(c, d), e, umbral), multStrassenParalelo(d, sumMatriz(g, e), umbral))
+      val (p5, p6) = parallel(multStrassenParalelo(sumMatriz(a, d), sumMatriz(e, h), umbral), multStrassenParalelo(sumMatriz(b, d), sumMatriz(g, h), umbral))
+      val p7 = multStrassenParalelo(sumMatriz(a, c), sumMatriz(e, f), umbral)
 
+      val A = sumMatriz(sumMatriz(p5, p4), sumMatriz(p6, p2))
+      val B = sumMatriz(p1, p2)
+      val C = sumMatriz(p3, p4)
+      val D = sumMatriz(sumMatriz(p1, p5), sumMatriz(p3, p7))
 
-  //Funcion que calcula la submatriz de una matriz
-  def subMatriz(m: Matriz, i: Int, j: Int, l: Int): Matriz = {
-    // Dada m, matriz cuadrada de NxN, 1 <= i, j <= N, i + n <= N, j + n <= N,
-    // devuelve la submatriz de nxn correspondiente a m[i .. i + (n-1), j .. j + (n-1)]
-
-    Vector.tabulate(l, l) { (row, col) =>
-      m(i + row)(j + col)
+      A ++ B ++ C ++ D
     }
   }
 
 
 
 
-  //Funciones que calcula la suma y resta de dos matrices
-  def sumMatriz(m1: Matriz, m2: Matriz): Matriz = {
-    // Recibe m1 y m2 matrices cuadradas de la misma dimensión (potencia de 2)
-    // y devuelve la matriz resultante de la suma de las dos matrices
 
-    Vector.tabulate(m1.length, m1.headOption.getOrElse(Vector()).length) { (i, j) =>
-      m1(i)(j) + m2(i)(j)
-    }
-  }
-  def restaMatriz(m1: Matriz, m2: Matriz): Matriz = {
-    // Recibe m1 y m2 matrices cuadradas de la misma dimensión (potencia de 2)
-    // y devuelve la matriz resultante de la resta de las dos matrices
-
-
-    Vector.tabulate(m1.length, m1.headOption.getOrElse(Vector()).length) { (i, j) =>
-      m1(i)(j) - m2(i)(j)
-    }
-  }
-
+  //Otra implementacion del multStrassenParalelo
+  /*
   def multStrassenPar(m1: Matriz, m2: Matriz): Matriz = {
     val n = m1.head.size
     val umbral = 64 // Ajusta este umbral según tus necesidades
@@ -285,6 +319,6 @@ class Taller4{
       }
     }
   }
-
+*/
 
 }
