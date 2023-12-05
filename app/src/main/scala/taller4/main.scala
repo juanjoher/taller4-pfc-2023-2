@@ -25,7 +25,7 @@ object main {
     } yield (println("Tamano de la matriz: " + math.pow(2, i).toInt +
       "\nTiempo secuencial, Paralelo, aceleracion: " + obj.Benchmark.compararAlgoritmos2(obj.multMatrizRec, obj.multMatrizRecPar)(m1, m2)))
 
-    /*
+
     print("\n")
     print("Mutilplicacion de matrices normal y paralelo: \n")
     for {
@@ -49,8 +49,8 @@ object main {
 
     print("Multiplicacion de productoPunto: \n")
     print(obj.Benchmark.compararProdPunto(100))
-
-     */
+    print(obj.Benchmark.compararProdPunto(1000))
+    print(obj.Benchmark.compararProdPunto(10000))
 
 
   }
