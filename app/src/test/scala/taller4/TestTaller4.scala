@@ -10,6 +10,8 @@ import org.scalatest.funsuite.AnyFunSuite
 import org.junit.runner.RunWith
 import org.scalatestplus.junit.JUnitRunner
 
+import scala.collection.parallel.immutable.ParVector
+
 @RunWith(classOf[JUnitRunner])
 class TestTaller4 extends AnyFunSuite{
     type Matriz = Vector[Vector[Int]]
@@ -149,36 +151,42 @@ val obj = new Taller4()
         assert(Vector(Vector(80, 70, 60, 50), Vector(240, 214, 188, 162),
             Vector(400, 358, 316, 274), Vector(560, 502, 444, 386)) == obj.multStrassen(matriz1, matriz2))
     }
-    test("testStrassenParalelo"){
+
+    test("testStrassenBinarios"){
         val obj = new Taller4()
         //matrices de 4x4
         val matriz1: Matriz = Vector(
-            Vector(1, 2, 3, 4),
-            Vector(5, 6, 7, 8),
-            Vector(9, 10, 11, 12),
-            Vector(13, 14, 15, 16)
+            Vector(1, 0, 1, 0),
+            Vector(0, 1, 0, 1),
+            Vector(1, 0, 1, 0),
+            Vector(0, 1, 0, 1)
         )
         val matriz2: Matriz = Vector(
-            Vector(16, 15, 14, 13),
-            Vector(12, 11, 10, 9),
-            Vector(8, 7, 6, 5),
-            Vector(4, 3, 2, 1)
+            Vector(1, 0, 1, 0),
+            Vector(0, 1, 0, 1),
+            Vector(1, 0, 1, 0),
+            Vector(0, 1, 0, 1)
         )
 
-        assert(Vector(Vector(80, 70, 60, 50), Vector(240, 214, 188, 162),
-            Vector(400, 358, 316, 274), Vector(560, 502, 444, 386)) == obj.multStrassenPar(matriz1, matriz2))
+        assert(Vector(Vector(2, 0, 2, 0), Vector(0, 2, 0, 2),
+            Vector(2, 0, 2, 0), Vector(0, 2, 0, 2)) == obj.multStrassen(matriz1, matriz2))
     }
+
+
+
     test("testProductoPunto") {
         val obj = new Taller4()
         val vector1: Vector[Int] = Vector(1, 2, 3, 4, 5)
         val vector2: Vector[Int] = Vector(25, 24, 23, 22, 21)
         assert(335 == obj.prodPunto(vector1, vector2))
     }
+    //Test de producto punto usando vectores con entradas binarias(0,1)
     test("testprodPuntoParD") {
         val obj = new Taller4()
-        val vector1: Vector[Int] = Vector(1, 2, 3, 4, 5)
-        val vector2: Vector[Int] = Vector(25, 24, 23, 22, 21)
-        assert(335 == obj.prodPuntoParD(vector1, vector2))
+        //vector 6x6
+        val vector1: ParVector[Int] = ParVector(1, 0, 1, 0, 1, 0)
+        val vector2: ParVector[Int] = ParVector(0, 1, 0, 1, 0, 1)
+        assert(0 == obj.prodPuntoParD(vector1, vector2))
     }
 
 

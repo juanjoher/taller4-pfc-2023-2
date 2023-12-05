@@ -21,11 +21,12 @@ object main {
   //IMPLEMENTACIONES DE FUNCIONES DE BENCHMARKING
 
   def main(args: Array[String]): Unit = {
-    println (
+    println(
       withWarmer(new Warmer.Default) measure {
         (1 to 100000000).toArray
       }
     )
+    /*
     print("Mutilplicacion de matrices recursivo: \n")
     for {
       i <- 1 to 8
@@ -33,6 +34,8 @@ object main {
       m2 = obj.matrizAlAzar(math.pow(2, i).toInt, 2)
     } yield (println("Tamano de la matriz: " + math.pow(2, i).toInt +
       "\nTiempo secuencial, Paralelo, aceleracion: " + obj.Benchmark.compararAlgoritmos2(obj.multMatrizRec, obj.multMatrizRecPar)(m1, m2)))
+
+
     print("\n")
     print("Mutilplicacion de matrices: \n")
     for {
@@ -41,6 +44,10 @@ object main {
       m2 = obj.matrizAlAzar(math.pow(2, i).toInt, 2)
     } yield (println("Tamano de la matriz: " + math.pow(2, i).toInt +
       "\nTiempo secuencial, Paralelo, aceleracion: " + obj.Benchmark.compararAlgoritmos2(obj.multMatriz, obj.multMatrizPar)(m1, m2)))
+
+
+     */
+
     print("\n")
     print("Mutilplicacion con el algoritmo de Strassen: \n")
     for {
@@ -49,6 +56,10 @@ object main {
       m2 = obj.matrizAlAzar(math.pow(2, i).toInt, 2)
     } yield (println("Tamano de la matriz: " + math.pow(2, i).toInt +
       "\nTiempo secuencial, Paralelo, aceleracion: " + obj.Benchmark.compararAlgoritmos2(obj.multStrassen, obj.multStrassenPar)(m1, m2)))
+
+    print("Multiplicacion de productoPunto: \n")
+    print(obj.Benchmark.compararProdPunto(100))
+
 
   }
 }
