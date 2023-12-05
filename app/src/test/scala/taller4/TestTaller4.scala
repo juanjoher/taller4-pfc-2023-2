@@ -84,7 +84,6 @@ class TestTaller4 extends AnyFunSuite{
         assert(Vector(Vector(2, 0, 2, 0), Vector(0, 2, 0, 2),
             Vector(2, 0, 2, 0), Vector(0, 2, 0, 2)) == obj.multMatrizRec(matriz1, matriz2))
     }
-
     test("testmultiplyMatricesParallel"){
         val obj = new Taller4()
         val matriz1: Matriz = Vector(
@@ -163,7 +162,6 @@ class TestTaller4 extends AnyFunSuite{
             Vector(3, 0, 3, 0, 3, 0), Vector(0, 3, 0, 3, 0, 3),
             Vector(3, 0, 3, 0, 3, 0), Vector(0, 3, 0, 3, 0, 3)) == obj.multStrassen(matriz1, matriz2))
     }
-
     test("testStrassenBinarios"){
         val obj = new Taller4()
         //matrices de 4x4

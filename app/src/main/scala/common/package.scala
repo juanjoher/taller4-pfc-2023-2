@@ -51,4 +51,11 @@ package object common {
     (ta.join(), tb.join(), tc.join(), td)
   }
 
+  def parallel[A,B,C](taskA: => A, taskB: => B, taskC: => C): (A,B,C) = {
+    val ta = task { taskA }
+    val tb = task { taskB }
+    val tc = taskC
+    (ta.join(), tb.join(), tc)
+  }
+
 }

@@ -118,11 +118,6 @@ class Taller4 {
     Vector.tabulate(l, l)((i, j) => m(j)(i))
   }
 
-  def transpuestaPar(m: MatrizPar): MatrizPar = {
-    val l = m.length
-    ParVector.tabulate(l, l)((i, j) => m(j)(i))
-  }
-
 
   //Funcion que calcula la multiplicacion de dos matrices normal, recursivo, con algoritmo de Strassen y paralelo
   def multMatriz(m1: Matriz, m2: Matriz): Matriz = {
@@ -181,33 +176,34 @@ class Taller4 {
 
   def multMatrizRecPar(m1: Matriz, m2: Matriz): Matriz = {
     val n = m1.length
-    val umbral = 64
-    if (n <= umbral) {
-      multMatrizRec(m1, m2)
-    } else {
-      val a = subMatriz(m1, 0, 0, n / 2)
-      val b = subMatriz(m1, 0, n / 2, n / 2)
-      val c = subMatriz(m1, n / 2, 0, n / 2)
-      val d = subMatriz(m1, n / 2, n / 2, n / 2)
+    val m = n / 2
+    val a11 = subMatriz(m1, 0, 0, m)
+    val a12 = subMatriz(m1, 0, m, m)
+    val a21 = subMatriz(m1, m, 0, m)
+    val a22 = subMatriz(m1, m, m, m)
 
-      val e = subMatriz(m2, 0, 0, n / 2)
-      val f = subMatriz(m2, 0, n / 2, n / 2)
-      val g = subMatriz(m2, n / 2, 0, n / 2)
-      val h = subMatriz(m2, n / 2, n / 2, n / 2)
+    val b11 = subMatriz(m2, 0, 0, m)
+    val b12 = subMatriz(m2, 0, m, m)
+    val b21 = subMatriz(m2, m, 0, m)
+    val b22 = subMatriz(m2, m, m, m)
 
-      val (p1, p2) = parallel(multMatrizRecPar(a, sumMatriz(f, h)), multMatrizRecPar(sumMatriz(a, b), h))
-      val (p3, p4) = parallel(multMatrizRecPar(sumMatriz(c, d), e), multMatrizRecPar(d, sumMatriz(g, e)))
-      val (p5, p6) = parallel(multMatrizRecPar(sumMatriz(a, d), sumMatriz(e, h)), multMatrizRecPar(sumMatriz(b, d), sumMatriz(g, h)))
-      val p7 = multMatrizRecPar(sumMatriz(a, c), sumMatriz(e, f))
+      val (p1,p2) = parallel(multMatrizRec(a11, b11), multMatrizRec(a12, b21))
+      val (p3,p4) = parallel(multMatrizRec(a11, b12), multMatrizRec(a12, b22))
+      val (p5,p6) = parallel(multMatrizRec(a21, b11), multMatrizRec(a22, b21))
+      val p7 = multMatrizRec(a21, b12)
 
-      val A = sumMatriz(sumMatriz(p5, p4), sumMatriz(p6, p2))
-      val B = sumMatriz(p1, p2)
-      val C = sumMatriz(p3, p4)
-      val D = sumMatriz(sumMatriz(p1, p5), sumMatriz(p3, p7))
+      val (c1,c2,c3,c4) = parallel(sumMatriz(sumMatriz(p5, p4), sumMatriz(p6, p2)),
+      sumMatriz(p1, p2), sumMatriz(p3, p4), sumMatriz(sumMatriz(p1, p5), sumMatriz(p3, p7)))
 
-      A ++ B ++ C ++ D
+      // Construir la matriz resultante
+      Vector.tabulate(n, n) { (i, j) =>
+        if (i < m && j < m) c1(i)(j)
+        else if (i < m && j >= m) c2(i)(j - m)
+        else if (i >= m && j < m) c3(i - m)(j)
+        else c4(i - m)(j - m)
+      }
     }
-  }
+
 
 
   //Funciones que calculan la multiplicacion de dos matrices con el algoritmo de Strassen y Strassen paralelo
